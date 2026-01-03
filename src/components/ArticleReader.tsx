@@ -124,21 +124,6 @@ const ArticleReader = () => {
                     <span> / {sentences.length}</span>
                 </div>
             </div>
-
-            {/* Optional speed control */}
-            <div style={{ marginTop: '10px', color: '#888' }}>
-                Speed:
-                <input
-                    type="range"
-                    min="50"
-                    max="500"
-                    step="10"
-                    value={wpm}
-                    onChange={(e) => setWpm(parseInt(e.target.value))}
-                    style={{ marginLeft: '10px', verticalAlign: 'middle' }}
-                />
-                <span style={{ marginLeft: '10px' }}>{wpm} WPM</span>
-            </div>
         </div>
     );
 };

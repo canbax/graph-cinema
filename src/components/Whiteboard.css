@@ -1,0 +1,52 @@
+.whiteboard-container {
+    position: relative;
+    width: 100%;
+    border: 1px solid #ddd;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.resize-handle {
+    height: 16px;
+    width: 100%;
+    cursor: ns-resize;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f8f9fa;
+    transition: background 0.2s;
+    user-select: none;
+    z-index: 10;
+    flex-shrink: 0;
+}
+
+.resize-handle:hover {
+    background: #e9ecef;
+}
+
+.resize-handle:active {
+    background: #dee2e6;
+}
+
+
+
+.resize-handle.bottom {
+    border-top: 1px solid #eee;
+}
+
+.handle-bar {
+    width: 40px;
+    height: 4px;
+    background-color: #cbd5e1;
+    border-radius: 2px;
+}
+
+.whiteboard-content {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+}
