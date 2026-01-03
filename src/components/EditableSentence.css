@@ -1,0 +1,100 @@
+.editable-sentence-container {
+    font-size: 24px;
+    line-height: 1.5;
+    width: 100%;
+    padding: 4px 8px;
+    background-color: #2a2a2a;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    min-height: 60px;
+    /* Ensure some height even if empty */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.editable-sentence-container.view {
+    white-space: nowrap;
+    overflow-x: auto;
+    cursor: text;
+
+    /* Hide scrollbar for cleaner look but allow scroll */
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
+}
+
+.editable-sentence-container.view::-webkit-scrollbar {
+    display: none;
+}
+
+.editable-sentence-container.view:hover {
+    background-color: #333333;
+    transform: scale(1.01);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+}
+
+.editable-sentence-container.editing {
+    background-color: #333333;
+    align-items: stretch;
+}
+
+.editable-textarea {
+    background-color: transparent;
+    border: 1px solid #444;
+    border-radius: 6px;
+    color: inherit;
+    font-family: inherit;
+    font-size: inherit;
+    margin: 8px;
+    outline: none;
+    resize: vertical;
+    min-height: 80px;
+}
+
+.editable-textarea:focus {
+    border-color: #646cff;
+    box-shadow: 0 0 0 2px rgba(100, 108, 255, 0.2);
+}
+
+.editable-controls {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.edit-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    color: white;
+}
+
+.edit-btn.save {
+    background-color: #3b82f6;
+    /* Blueish */
+}
+
+.edit-btn.save:hover {
+    background-color: #2563eb;
+}
+
+.edit-btn.cancel {
+    background-color: #3a3a3a;
+    border: 1px solid #555;
+    color: #ccc;
+}
+
+.edit-btn.cancel:hover {
+    background-color: #444;
+    color: white;
+}

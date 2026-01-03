@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Play, Pause, SkipBack, SkipForward } from 'lucide-react';
 import './ArticleReader.css';
+import EditableSentence from './EditableSentence';
 
 const ArticleReader = () => {
     const [text, setText] = useState(localStorage.getItem('articleText') || '');
@@ -91,12 +92,39 @@ const ArticleReader = () => {
         }
     };
 
+    const handleSentenceSave = (newSentence: string) => {
+        let newSentences = [...sentences];
+        // If sentences array is empty (initial state), we are just setting the text
+        if (newSentences.length === 0) {
+            newSentences = [newSentence];
+        } else {
+            newSentences[currentIndex] = newSentence;
+        }
+
+        // Join with space. This assumes the user inputs punctuation. 
+        // If they don't, the next regex split might merge sentences.
+        const newText = newSentences.join(' ');
+
+        setText(newText);
+        localStorage.setItem('articleText', newText);
+    };
+
     return (
         <div className="article-reader-container">
 
-            <div className="current-sentence-display">
-                {sentences.length > 0 ? sentences[currentIndex] : 'Enter text to start reading...'}
-            </div>
+            {sentences.length > 0 ? (
+                <EditableSentence
+                    text={sentences[currentIndex]}
+                    onSave={handleSentenceSave}
+                    placeholder="Enter text to start reading..."
+                />
+            ) : (
+                <EditableSentence
+                    text=""
+                    onSave={handleSentenceSave}
+                    placeholder="Enter text to start reading..."
+                />
+            )}
 
             <div className="controls">
                 <button className="control-btn secondary" onClick={handlePrev} disabled={currentIndex === 0} title="Previous Sentence">
