@@ -9,11 +9,14 @@ function App() {
 
   return (
     <>
-      <Whiteboard />
+
       {!hasProcessed ? (
         <TextImporter onProcess={() => setHasProcessed(true)} />
       ) : (
-        <ArticleReader />
+        <div>
+          <Whiteboard />
+          <ArticleReader />
+        </div>
       )}
     </>
   )
