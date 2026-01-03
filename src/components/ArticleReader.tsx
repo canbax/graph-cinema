@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { Play, Pause, SkipBack, SkipForward } from 'lucide-react';
 import './ArticleReader.css';
 
 const ArticleReader = () => {
@@ -98,16 +99,16 @@ const ArticleReader = () => {
             </div>
 
             <div className="controls">
-                <button className="control-btn" onClick={handlePrev} disabled={currentIndex === 0}>
-                    Previous
+                <button className="control-btn secondary" onClick={handlePrev} disabled={currentIndex === 0} title="Previous Sentence">
+                    <SkipBack size={24} />
                 </button>
 
-                <button className="control-btn" onClick={handlePlayPause} disabled={sentences.length === 0}>
-                    {isPlaying ? 'Pause' : 'Play'}
+                <button className="control-btn primary" onClick={handlePlayPause} disabled={sentences.length === 0} title={isPlaying ? "Pause" : "Play"}>
+                    {isPlaying ? <Pause size={32} /> : <Play size={32} fill="currentColor" />}
                 </button>
 
-                <button className="control-btn" onClick={handleNext} disabled={currentIndex === sentences.length - 1}>
-                    Next
+                <button className="control-btn secondary" onClick={handleNext} disabled={currentIndex === sentences.length - 1} title="Next Sentence">
+                    <SkipForward size={24} />
                 </button>
 
                 <div className="pagination-control">
