@@ -2,13 +2,23 @@ import { useState, useEffect, useRef } from 'react';
 import './ArticleReader.css';
 
 const ArticleReader = () => {
-    const [text, setText] = useState('');
+    const [text, setText] = useState(localStorage.getItem('articleText') || '');
     const [sentences, setSentences] = useState<string[]>([]);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isPlaying, setIsPlaying] = useState(false);
     const [wpm, setWpm] = useState(200); // Words per minute
 
     const timerRef = useRef<number | null>(null);
+
+    useEffect(() => {
+        // Re-read from local storage if component mounts again or we can just rely on initial state.
+        // If we want to support updates we might need a way to refresh.
+        // But for now initial state is enough as the component will likely be unmounted/remounted.
+        const storedText = localStorage.getItem('articleText');
+        if (storedText) {
+            setText(storedText);
+        }
+    }, []);
 
     useEffect(() => {
         // Simple sentence splitting on punctuation. 
@@ -82,12 +92,6 @@ const ArticleReader = () => {
 
     return (
         <div className="article-reader-container">
-            <textarea
-                className="article-input"
-                placeholder="Paste your article here..."
-                value={text}
-                onChange={(e) => setText(e.target.value)}
-            />
 
             <div className="current-sentence-display">
                 {sentences.length > 0 ? sentences[currentIndex] : 'Enter text to start reading...'}
