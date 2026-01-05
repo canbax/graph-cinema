@@ -18,7 +18,7 @@ const TextImporter = ({ onProcess }: TextImporterProps) => {
         <div className="text-importer-container">
             <textarea
                 className="article-input"
-                placeholder="Paste your article here..."
+                placeholder="Paste your text here to convert into graph ..."
                 value={text}
                 onChange={(e) => setText(e.target.value)}
             />
