@@ -3,7 +3,11 @@ import { Play, Pause, SkipBack, SkipForward } from 'lucide-react';
 import './ArticleReader.css';
 import EditableSentence from './EditableSentence';
 
-const ArticleReader = () => {
+interface ArticleReaderProps {
+    onSentenceChange?: (sentence: string) => void;
+}
+
+const ArticleReader = ({ onSentenceChange }: ArticleReaderProps) => {
     const [text, setText] = useState(localStorage.getItem('articleText') || '');
     const [sentences, setSentences] = useState<string[]>([]);
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -41,6 +45,12 @@ const ArticleReader = () => {
             setCurrentIndex(0);
         }
     }, [text]);
+
+    useEffect(() => {
+        if (sentences.length > 0 && onSentenceChange) {
+            onSentenceChange(sentences[currentIndex]);
+        }
+    }, [currentIndex, sentences, onSentenceChange]);
 
     useEffect(() => {
         if (isPlaying && currentIndex < sentences.length) {

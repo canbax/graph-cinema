@@ -6,6 +6,7 @@ import './App.css'
 
 function App() {
   const [hasProcessed, setHasProcessed] = useState(false);
+  const [currentSentence, setCurrentSentence] = useState('');
 
   return (
     <>
@@ -14,8 +15,8 @@ function App() {
         <TextImporter onProcess={() => setHasProcessed(true)} />
       ) : (
         <div>
-          <Whiteboard />
-          <ArticleReader />
+          <Whiteboard currentSentence={currentSentence} />
+          <ArticleReader onSentenceChange={setCurrentSentence} />
         </div>
       )}
     </>
