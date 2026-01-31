@@ -1,25 +1,9 @@
-import { useState } from 'react'
-import Whiteboard from './components/Whiteboard'
-import ArticleReader from './components/ArticleReader'
-import TextImporter from './components/TextImporter'
+import WorkspaceLayout from './components/workspace/WorkspaceLayout'
 import './App.css'
 
 function App() {
-  const [hasProcessed, setHasProcessed] = useState(false);
-  const [currentSentence, setCurrentSentence] = useState('');
-
   return (
-    <>
-
-      {!hasProcessed ? (
-        <TextImporter onProcess={() => setHasProcessed(true)} />
-      ) : (
-        <div>
-          <Whiteboard currentSentence={currentSentence} />
-          <ArticleReader onSentenceChange={setCurrentSentence} />
-        </div>
-      )}
-    </>
+    <WorkspaceLayout />
   )
 }
 
