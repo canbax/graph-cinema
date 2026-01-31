@@ -1,9 +1,11 @@
 
 import { textToMermaid } from "text-to-mermaid";
 import { parseMermaidToExcalidraw } from "@excalidraw/mermaid-to-excalidraw";
+import { convertToExcalidrawElements } from "@excalidraw/excalidraw";
+import type { OrderedExcalidrawElement } from "@excalidraw/excalidraw/element/types";
 
 
-export async function generateGraphFromSentence(sentence: string, apiKey: string): Promise<any> {
+export async function generateGraphFromSentence(sentence: string, apiKey: string): Promise<OrderedExcalidrawElement[]> {
 
     try {
         const text = await textToMermaid(sentence, { useAI: false });
@@ -11,8 +13,10 @@ export async function generateGraphFromSentence(sentence: string, apiKey: string
         if (!text) {
             throw new Error("No mermaid text generated");
         }
+
         const excalidraw = await parseMermaidToExcalidraw(text);
-        return excalidraw;
+
+        return convertToExcalidrawElements(excalidraw.elements);
     } catch (error) {
         console.error("Error generating graph:", error);
         throw error;

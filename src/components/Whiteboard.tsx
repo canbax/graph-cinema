@@ -3,6 +3,7 @@ import { Excalidraw } from "@excalidraw/excalidraw";
 // import { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types/types"; // Fixed: removed invalid import
 import { generateGraphFromSentence } from "../services/gemini";
 import "./Whiteboard.css";
+import type { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
 
 interface WhiteboardProps {
   currentSentence?: string;
@@ -10,7 +11,7 @@ interface WhiteboardProps {
 
 export default function Whiteboard({ currentSentence }: WhiteboardProps) {
   const [height, setHeight] = useState(500);
-  const [excalidrawAPI, setExcalidrawAPI] = useState<any>(null);
+  const [excalidrawAPI, setExcalidrawAPI] = useState<ExcalidrawImperativeAPI | null>(null);
   const isDraggingRef = useRef<'top' | 'bottom' | null>(null);
   const startYRef = useRef(0);
   const startHeightRef = useRef(0);
@@ -32,12 +33,9 @@ export default function Whiteboard({ currentSentence }: WhiteboardProps) {
     const generate = async () => {
       try {
         const graphData = await generateGraphFromSentence(currentSentence, apiKeyRef.current);
-        if (graphData && graphData.elements) {
-          excalidrawAPI.updateScene({
-            elements: graphData.elements,
-            appState: graphData.appState || {}
-          });
-          excalidrawAPI.scrollToContent(graphData.elements, { fitToContent: true });
+        if (graphData) {
+          excalidrawAPI.updateScene({ elements: graphData });
+          excalidrawAPI.scrollToContent(graphData, { fitToContent: true });
         }
       } catch (error) {
         console.error("Failed to generate graph", error);
