@@ -16,7 +16,7 @@
     "lucide-react": "^0.562.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
-    "text-to-mermaid": "^0.0.2"
+    "text-to-mermaid": "^0.0.4"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",

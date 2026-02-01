@@ -15,12 +15,12 @@ export async function generateGraphFromSentence(sentence: string): Promise<Order
             useAI: settings.useAI,
             aiConfig: settings.useAI ? {
                 apiKey: settings.aiApiKey || '',
-                baseURL: settings.aiBaseUrl || undefined
+                baseUrl: settings.aiBaseUrl || undefined
             } : undefined
         };
 
+        console.log(options);
         const text = await textToMermaid(sentence, options);
-        console.log(text);
         if (!text) {
             throw new Error("No mermaid text generated");
         }

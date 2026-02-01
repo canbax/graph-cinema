@@ -1,7 +1,6 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import { Excalidraw } from "@excalidraw/excalidraw";
-// import { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types/types"; // Fixed: removed invalid import
-import { generateGraphFromSentence } from "../services/gemini";
+import { generateGraphFromSentence } from "../services/text2excalidraw";
 import "./Whiteboard.css";
 import type { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
 
