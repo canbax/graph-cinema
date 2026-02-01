@@ -23,10 +23,21 @@ export default function SettingsDialog({ isOpen, onClose }: SettingsDialogProps)
         onClose();
     };
 
+    const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
+        if (e.target === e.currentTarget) {
+            const savedSettings = AppSettingsService.getSettings();
+            const hasChanges = JSON.stringify(settings) !== JSON.stringify(savedSettings);
+
+            if (!hasChanges) {
+                onClose();
+            }
+        }
+    };
+
     if (!isOpen) return null;
 
     return createPortal(
-        <div className="settings-overlay" style={{
+        <div className="settings-overlay" onClick={handleOverlayClick} style={{
             position: 'fixed',
             top: 0,
             left: 0,
@@ -38,6 +49,7 @@ export default function SettingsDialog({ isOpen, onClose }: SettingsDialogProps)
             alignItems: 'center',
             zIndex: 9999
         }}>
+
             <div className="settings-modal" style={{
                 backgroundColor: 'white',
                 padding: '20px',

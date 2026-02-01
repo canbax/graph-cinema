@@ -63,10 +63,16 @@ export default function ScriptSidebar({
         <div className="script-sidebar">
             <div className="sidebar-header">
                 <h2 className="sidebar-title">Script</h2>
-                <button className="sidebar-toggle" onClick={toggleSidebar} title="Collapse Sidebar">
-                    <PanelLeftClose size={20} />
-                </button>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                    <button className="sidebar-toggle" onClick={() => setIsSettingsOpen(true)} title="Settings">
+                        <Settings size={20} />
+                    </button>
+                    <button className="sidebar-toggle" onClick={toggleSidebar} title="Collapse Sidebar">
+                        <PanelLeftClose size={20} />
+                    </button>
+                </div>
             </div>
+
 
             <div className="sidebar-content">
                 <textarea
