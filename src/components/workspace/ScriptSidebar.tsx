@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
-import { PanelLeftClose, PanelLeftOpen, FileText } from 'lucide-react';
+import { PanelLeftClose, PanelLeftOpen, Settings } from 'lucide-react';
+import SettingsDialog from './SettingsDialog';
+
 
 interface ScriptSidebarProps {
     sentences: string[];
@@ -21,6 +23,8 @@ export default function ScriptSidebar({
     toggleSidebar
 }: ScriptSidebarProps) {
     const [rawText, setRawText] = useState(initialText);
+    const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+
 
     useEffect(() => {
         if (initialText) setRawText(initialText);
@@ -39,11 +43,21 @@ export default function ScriptSidebar({
                     </button>
                 </div>
                 <div className="sidebar-content" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
-                    <FileText size={20} color="#666" />
+                    <button className="sidebar-toggle" onClick={() => setIsSettingsOpen(true)} title="Settings">
+                        <Settings size={20} color="#666" />
+                    </button>
                 </div>
-            </div>
+
+
+
+                <SettingsDialog
+                    isOpen={isSettingsOpen}
+                    onClose={() => setIsSettingsOpen(false)}
+                />
+            </div >
         );
     }
+
 
     return (
         <div className="script-sidebar">
@@ -87,6 +101,13 @@ export default function ScriptSidebar({
                     )}
                 </ul>
             </div>
-        </div>
+
+
+            <SettingsDialog
+                isOpen={isSettingsOpen}
+                onClose={() => setIsSettingsOpen(false)}
+            />
+        </div >
     );
+
 }

@@ -5,10 +5,21 @@ import { convertToExcalidrawElements } from "@excalidraw/excalidraw";
 import type { OrderedExcalidrawElement } from "@excalidraw/excalidraw/element/types";
 
 
-export async function generateGraphFromSentence(sentence: string, apiKey: string): Promise<OrderedExcalidrawElement[]> {
+import { AppSettingsService } from "./AppSettingsService";
+
+export async function generateGraphFromSentence(sentence: string): Promise<OrderedExcalidrawElement[]> {
 
     try {
-        const text = await textToMermaid(sentence, { useAI: false });
+        const settings = AppSettingsService.getSettings();
+        const options = {
+            useAI: settings.useAI,
+            aiConfig: settings.useAI ? {
+                apiKey: settings.aiApiKey || '',
+                baseURL: settings.aiBaseUrl || undefined
+            } : undefined
+        };
+
+        const text = await textToMermaid(sentence, options);
         console.log(text);
         if (!text) {
             throw new Error("No mermaid text generated");

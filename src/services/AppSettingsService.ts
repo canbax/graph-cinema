@@ -1,0 +1,32 @@
+export interface AppSettings {
+    useAI: boolean;
+    aiBaseUrl?: string;
+    aiApiKey?: string;
+}
+
+const SETTINGS_KEY = 'app_settings';
+
+const DEFAULT_SETTINGS: AppSettings = {
+    useAI: false,
+    aiBaseUrl: '',
+    aiApiKey: '',
+};
+
+export const AppSettingsService = {
+    saveSettings: (settings: AppSettings) => {
+        localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+    },
+
+    getSettings: (): AppSettings => {
+        const stored = localStorage.getItem(SETTINGS_KEY);
+        if (stored) {
+            try {
+                return { ...DEFAULT_SETTINGS, ...JSON.parse(stored) };
+            } catch (e) {
+                console.error("Failed to parse app settings", e);
+                return DEFAULT_SETTINGS;
+            }
+        }
+        return DEFAULT_SETTINGS;
+    }
+};

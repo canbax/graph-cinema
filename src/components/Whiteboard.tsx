@@ -15,24 +15,13 @@ export default function Whiteboard({ currentSentence }: WhiteboardProps) {
   const isDraggingRef = useRef<'top' | 'bottom' | null>(null);
   const startYRef = useRef(0);
   const startHeightRef = useRef(0);
-  const apiKeyRef = useRef(import.meta.env.VITE_GEMINI_API_KEY || '');
 
   useEffect(() => {
     if (!currentSentence || !excalidrawAPI) return;
 
-    if (!apiKeyRef.current) {
-      const key = prompt("Please enter your Gemini API Key:");
-      if (key) {
-        apiKeyRef.current = key;
-      } else {
-        console.warn("No API Key provided, skipping graph generation.");
-        return;
-      }
-    }
-
     const generate = async () => {
       try {
-        const graphData = await generateGraphFromSentence(currentSentence, apiKeyRef.current);
+        const graphData = await generateGraphFromSentence(currentSentence);
         if (graphData) {
           excalidrawAPI.updateScene({ elements: graphData });
           excalidrawAPI.scrollToContent(graphData, { fitToContent: true });
@@ -45,6 +34,7 @@ export default function Whiteboard({ currentSentence }: WhiteboardProps) {
     generate();
 
   }, [currentSentence, excalidrawAPI]);
+
 
   const handleMouseMove = useCallback((e: MouseEvent) => {
     if (!isDraggingRef.current) return;
