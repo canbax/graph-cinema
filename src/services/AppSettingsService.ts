@@ -1,5 +1,7 @@
+import { ParseStrategy } from 'text-to-mermaid';
+
 export interface AppSettings {
-    useAI: boolean;
+    parseStrategy: ParseStrategy;
     aiBaseUrl?: string;
     aiApiKey?: string;
 }
@@ -7,7 +9,7 @@ export interface AppSettings {
 const SETTINGS_KEY = 'app_settings';
 
 const DEFAULT_SETTINGS: AppSettings = {
-    useAI: false,
+    parseStrategy: ParseStrategy.Deterministic,
     aiBaseUrl: '',
     aiApiKey: '',
 };

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
+import { ParseStrategy } from 'text-to-mermaid';
 import { AppSettingsService, type AppSettings } from '../../services/AppSettingsService';
 
 
@@ -73,47 +74,71 @@ export default function SettingsDialog({ isOpen, onClose }: SettingsDialogProps)
                 <form onSubmit={(e) => { e.preventDefault(); handleSave(); }}>
                     <div className="settings-content">
                         <div className="form-group" style={{ marginBottom: '15px' }}>
-                            <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
-                                <input
-                                    type="checkbox"
-                                    checked={settings.useAI}
-                                    onChange={(e) => setSettings({ ...settings, useAI: e.target.checked })}
-                                    style={{ marginRight: '10px' }}
-                                />
-                                Use AI
-                            </label>
+                            <label style={{ display: 'block', marginBottom: '10px', fontWeight: 'bold' }}>Parse Strategy</label>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+                                    <input
+                                        type="radio"
+                                        name="parseStrategy"
+                                        value={ParseStrategy.Deterministic}
+                                        checked={settings.parseStrategy === ParseStrategy.Deterministic}
+                                        onChange={() => setSettings({ ...settings, parseStrategy: ParseStrategy.Deterministic })}
+                                        style={{ marginRight: '10px' }}
+                                    />
+                                    Deterministic (Rule-based)
+                                </label>
+                                <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+                                    <input
+                                        type="radio"
+                                        name="parseStrategy"
+                                        value={ParseStrategy.Gemini}
+                                        checked={settings.parseStrategy === ParseStrategy.Gemini}
+                                        onChange={() => setSettings({ ...settings, parseStrategy: ParseStrategy.Gemini })}
+                                        style={{ marginRight: '10px' }}
+                                    />
+                                    Gemini AI
+                                </label>
+                                <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+                                    <input
+                                        type="radio"
+                                        name="parseStrategy"
+                                        value={ParseStrategy.Llm}
+                                        checked={settings.parseStrategy === ParseStrategy.Llm}
+                                        onChange={() => setSettings({ ...settings, parseStrategy: ParseStrategy.Llm })}
+                                        style={{ marginRight: '10px' }}
+                                    />
+                                    Local LLM / Custom
+                                </label>
+                            </div>
                         </div>
 
-                        {settings.useAI && (
-                            <>
-                                <div className="form-group" style={{ marginBottom: '15px' }}>
-                                    <label htmlFor="aiBaseUrl" style={{ display: 'block', marginBottom: '5px', fontSize: '0.9rem' }}>AI Base URL</label>
-                                    <input
-                                        id="aiBaseUrl"
-                                        type="text"
-                                        value={settings.aiBaseUrl || ''}
-                                        onChange={(e) => setSettings({ ...settings, aiBaseUrl: e.target.value })}
-                                        placeholder="https://api.openai.com/v1"
-                                        style={{ width: '95%', padding: '8px', borderRadius: '4px', border: '1px solid #ccc' }}
-                                    />
-                                </div>
+                        {settings.parseStrategy === ParseStrategy.Gemini && (
+                            <div className="form-group" style={{ marginBottom: '15px' }}>
+                                <label htmlFor="aiApiKey" style={{ display: 'block', marginBottom: '5px', fontSize: '0.9rem' }}>Gemini API Key</label>
+                                <input
+                                    id="aiApiKey"
+                                    type="password"
+                                    value={settings.aiApiKey || ''}
+                                    onChange={(e) => setSettings({ ...settings, aiApiKey: e.target.value })}
+                                    placeholder="sk-..."
+                                    autoComplete="off"
+                                    style={{ width: '95%', padding: '8px', borderRadius: '4px', border: '1px solid #ccc' }}
+                                />
+                            </div>
+                        )}
 
-
-                                <div className="form-group" style={{ marginBottom: '15px' }}>
-                                    <label htmlFor="aiApiKey" style={{ display: 'block', marginBottom: '5px', fontSize: '0.9rem' }}>AI API Key</label>
-                                    <input
-                                        id="aiApiKey"
-                                        type="password"
-                                        value={settings.aiApiKey || ''}
-                                        onChange={(e) => setSettings({ ...settings, aiApiKey: e.target.value })}
-                                        placeholder="sk-..."
-                                        autoComplete="off"
-                                        style={{ width: '95%', padding: '8px', borderRadius: '4px', border: '1px solid #ccc' }}
-                                    />
-
-                                </div>
-
-                            </>
+                        {settings.parseStrategy === ParseStrategy.Llm && (
+                            <div className="form-group" style={{ marginBottom: '15px' }}>
+                                <label htmlFor="aiBaseUrl" style={{ display: 'block', marginBottom: '5px', fontSize: '0.9rem' }}>LLM Base URL</label>
+                                <input
+                                    id="aiBaseUrl"
+                                    type="text"
+                                    value={settings.aiBaseUrl || ''}
+                                    onChange={(e) => setSettings({ ...settings, aiBaseUrl: e.target.value })}
+                                    placeholder="http://localhost:11434/v1"
+                                    style={{ width: '95%', padding: '8px', borderRadius: '4px', border: '1px solid #ccc' }}
+                                />
+                            </div>
                         )}
                     </div>
 

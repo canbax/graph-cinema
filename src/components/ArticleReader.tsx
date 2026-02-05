@@ -12,7 +12,7 @@ const ArticleReader = ({ onSentenceChange }: ArticleReaderProps) => {
     const [sentences, setSentences] = useState<string[]>([]);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isPlaying, setIsPlaying] = useState(false);
-    const [wpm, setWpm] = useState(200); // Words per minute
+    const [wpm] = useState(200); // Words per minute
 
     const timerRef = useRef<number | null>(null);
 
