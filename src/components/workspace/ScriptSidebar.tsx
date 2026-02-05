@@ -96,10 +96,10 @@ export default function ScriptSidebar({
                         onClick={handleDirectConvert}
                         title="Convert whole text to a single diagram"
                     >
-                        Direct Convert
+                        Draw Entire Script
                     </button>
                     <button className="process-button" onClick={handleProcess}>
-                        Update Script
+                        Draw Scene by Scene
                     </button>
                 </div>
 
