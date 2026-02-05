@@ -11,6 +11,7 @@ export default function WorkspaceLayout() {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isPlaying, setIsPlaying] = useState(false);
     const [wpm] = useState(200);
+    const [isWholeTextMode, setIsWholeTextMode] = useState(false);
 
     const timerRef = useRef<number | null>(null);
 
@@ -44,6 +45,15 @@ export default function WorkspaceLayout() {
         setRawText(text);
         parseText(text);
         setIsPlaying(false); // Stop playback on new text
+        setIsWholeTextMode(false);
+    };
+
+    const handleDirectConvert = (text: string) => {
+        setRawText(text);
+        setSentences([text]);
+        setCurrentIndex(0);
+        setIsPlaying(false);
+        setIsWholeTextMode(true);
     };
 
     // Playback Logic
@@ -89,24 +99,28 @@ export default function WorkspaceLayout() {
                 currentIndex={currentIndex}
                 onSentenceSelect={setCurrentIndex}
                 onProcessText={handleTextProcess}
+                onDirectConvert={handleDirectConvert}
                 initialText={rawText}
                 isCollapsed={isSidebarCollapsed}
                 toggleSidebar={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+                isWholeTextMode={isWholeTextMode}
             />
 
             <CinemaCanvas
                 currentSentence={sentences[currentIndex] || ''}
             />
 
-            <TimelineController
-                isPlaying={isPlaying}
-                currentIndex={currentIndex}
-                totalSentences={sentences.length}
-                onPlayPause={handlePlayPause}
-                onNext={handleNext}
-                onPrev={handlePrev}
-                onSeek={handleSeek}
-            />
+            {!isWholeTextMode && (
+                <TimelineController
+                    isPlaying={isPlaying}
+                    currentIndex={currentIndex}
+                    totalSentences={sentences.length}
+                    onPlayPause={handlePlayPause}
+                    onNext={handleNext}
+                    onPrev={handlePrev}
+                    onSeek={handleSeek}
+                />
+            )}
         </div>
     );
 }
