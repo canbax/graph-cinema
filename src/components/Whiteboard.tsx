@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Excalidraw } from "@excalidraw/excalidraw";
 import { generateGraphFromSentence } from "../services/text2excalidraw";
 import "./Whiteboard.css";
@@ -35,30 +35,6 @@ export default function Whiteboard({ currentSentence }: WhiteboardProps) {
   }, [currentSentence, excalidrawAPI]);
 
 
-  const handleMouseMove = useCallback((e: MouseEvent) => {
-    if (!isDraggingRef.current) return;
-
-    const delta = e.clientY - startYRef.current;
-
-    // For top handle: Dragging UP (-delta) should INCREASE height?
-    // Dragging DOWN (+delta) should DECREASE height?
-    // Current logic: newHeight = startHeight - delta
-    // If delta is -50 (up), height += 50. Correct direction for size.
-    // For bottom handle: Dragging DOWN (+delta) should INCREASE height.
-    // newHeight = startHeight + delta
-
-    if (isDraggingRef.current === 'bottom') {
-      setHeight(Math.max(200, startHeightRef.current + delta));
-    }
-  }, []);
-
-  const handleMouseUp = useCallback(() => {
-    isDraggingRef.current = null;
-    document.body.style.cursor = '';
-    window.removeEventListener('mousemove', handleMouseMove);
-    window.removeEventListener('mouseup', handleMouseUp);
-  }, [handleMouseMove]);
-
   const handleMouseDown = (e: React.MouseEvent) => {
     isDraggingRef.current = 'bottom';
     startYRef.current = e.clientY;
@@ -66,8 +42,23 @@ export default function Whiteboard({ currentSentence }: WhiteboardProps) {
     document.body.style.cursor = 'ns-resize';
     e.preventDefault();
 
-    window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('mouseup', handleMouseUp);
+    const onMouseMove = (me: MouseEvent) => {
+      if (!isDraggingRef.current) return;
+      const delta = me.clientY - startYRef.current;
+      if (isDraggingRef.current === 'bottom') {
+        setHeight(Math.max(200, startHeightRef.current + delta));
+      }
+    };
+
+    const onMouseUp = () => {
+      isDraggingRef.current = null;
+      document.body.style.cursor = '';
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup', onMouseUp);
+    };
+
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onMouseUp);
   };
 
   return (

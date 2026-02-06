@@ -43,7 +43,7 @@ export function fixDiagramLayout(elements: OrderedExcalidrawElement[]): OrderedE
     // CLEANUP: Sanitize text (remove newlines, trim, fix split words)
     elements = elements.map(el => {
         if (el.type === "text") {
-            let text = (el as any).text || "";
+            let text = el.text || "";
             text = text.replace(/[\n\r]+/g, "");
             text = text.trim();
             return { ...el, text };
@@ -68,14 +68,16 @@ export function fixDiagramLayout(elements: OrderedExcalidrawElement[]): OrderedE
 
     // Pass 0: Unwrap text if necessary
     const textAdjustedElements = elements.map(el => {
-        const elemText = (el as any).text;
-        if (el.type === "text" && elemText) {
-            const newWidth = TEXT_MIN_WIDTH * elemText.length;
-            if (el.width >= newWidth) return el;
-            if (newWidth !== el.width) {
-                const estimatedLines = Math.max(1, Math.ceil((elemText.length * 8) / newWidth));
-                const newHeight = estimatedLines * 20;
-                return { ...el, width: newWidth, height: newHeight };
+        if (el.type === "text") {
+            const elemText = el.text;
+            if (elemText) {
+                const newWidth = TEXT_MIN_WIDTH * elemText.length;
+                if (el.width >= newWidth) return el;
+                if (newWidth !== el.width) {
+                    const estimatedLines = Math.max(1, Math.ceil((elemText.length * 8) / newWidth));
+                    const newHeight = estimatedLines * 20;
+                    return { ...el, width: newWidth, height: newHeight };
+                }
             }
         }
         return el;
@@ -90,7 +92,7 @@ export function fixDiagramLayout(elements: OrderedExcalidrawElement[]): OrderedE
     });
 
     // Pass 1: Adjust containers and calculate needed shifts
-    let elementsWithResizedContainers = textAdjustedElements.map(el => {
+    const elementsWithResizedContainers = textAdjustedElements.map(el => {
         if (["ellipse", "diamond", "rectangle"].includes(el.type)) {
             const textEl = containerTextMap.get(el.id);
             if (textEl) {
@@ -126,7 +128,7 @@ export function fixDiagramLayout(elements: OrderedExcalidrawElement[]): OrderedE
     });
 
     // Pass 2: Adjust text positions based on their container's adjustment
-    let currentElements = elementsWithResizedContainers.map(el => {
+    const currentElements = elementsWithResizedContainers.map(el => {
         if (el.type === "text" && el.containerId) {
             const adj = adjustments.get(el.containerId);
             if (adj) {

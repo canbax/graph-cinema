@@ -102,7 +102,7 @@ export function splitSentences(text: string): string[] {
     const swappedCitations = new Map<string, string>();
     let swapCounter = 0;
 
-    processedText = processedText.replace(/([.!?])\s*(\[\d+\])/g, (match, _punct, _cite) => {
+    processedText = processedText.replace(/([.!?])\s*(\[\d+\])/g, (match) => {
         // match is ".[3]" or "?[3]"
         // We want to force a split AFTER this whole block, but treat it as one unit.
         // If we replace ".[3]" with a placeholder "PH", Segmenter sees "word PH Next".

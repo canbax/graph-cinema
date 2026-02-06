@@ -9,41 +9,22 @@ interface ArticleReaderProps {
 }
 
 const ArticleReader = ({ onSentenceChange }: ArticleReaderProps) => {
-    const [text, setText] = useState(localStorage.getItem('articleText') || '');
-    const [sentences, setSentences] = useState<string[]>([]);
+    const [sentences, setSentences] = useState<string[]>(() => {
+        const storedText = localStorage.getItem('articleText') || '';
+        // Same logic as splitSentences usage
+        // Note: splitSentences imported from utils
+        if (!storedText.trim()) return [];
+        const res = splitSentences(storedText);
+        // If split returns empty but text not empty, wrap it
+        return (res && res.length > 0) ? res : [storedText];
+    });
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isPlaying, setIsPlaying] = useState(false);
     const [wpm] = useState(200); // Words per minute
 
     const timerRef = useRef<number | null>(null);
 
-    useEffect(() => {
-        // Re-read from local storage if component mounts again or we can just rely on initial state.
-        // If we want to support updates we might need a way to refresh.
-        // But for now initial state is enough as the component will likely be unmounted/remounted.
-        const storedText = localStorage.getItem('articleText');
-        if (storedText) {
-            setText(storedText);
-        }
-    }, []);
-
-    useEffect(() => {
-        // Simple sentence splitting on punctuation. 
-        // This can be improved for edge cases like "Mr.", "U.S.A.", etc.
-        if (!text.trim()) {
-            setSentences([]);
-            return;
-        }
-
-        const result = splitSentences(text);
-        if (result && result.length > 0) {
-            setSentences(result);
-            setCurrentIndex(0);
-        } else {
-            setSentences([text]);
-            setCurrentIndex(0);
-        }
-    }, [text]);
+    // Removed redundant useEffect
 
     useEffect(() => {
         if (sentences.length > 0 && onSentenceChange) {
@@ -114,8 +95,21 @@ const ArticleReader = ({ onSentenceChange }: ArticleReaderProps) => {
         // If they don't, the next regex split might merge sentences.
         const newText = newSentences.join(' ');
 
-        setText(newText);
         localStorage.setItem('articleText', newText);
+
+        // Re-split and update sentences
+        if (!newText.trim()) {
+            setSentences([]);
+        } else {
+            const result = splitSentences(newText);
+            if (result && result.length > 0) {
+                setSentences(result);
+                setCurrentIndex(0);
+            } else {
+                setSentences([newText]);
+                setCurrentIndex(0);
+            }
+        }
     };
 
     return (

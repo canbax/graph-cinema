@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { PanelLeftClose, PanelLeftOpen, Settings } from 'lucide-react';
 import SettingsDialog from './SettingsDialog';
 
@@ -30,9 +30,11 @@ export default function ScriptSidebar({
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
 
-    useEffect(() => {
-        if (initialText) setRawText(initialText);
-    }, [initialText]);
+    const [prevInitialText, setPrevInitialText] = useState(initialText);
+    if (initialText !== prevInitialText) {
+        setPrevInitialText(initialText);
+        setRawText(initialText);
+    }
 
     const handleProcess = () => {
         onProcessText(rawText);

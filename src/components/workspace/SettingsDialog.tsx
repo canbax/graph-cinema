@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import { ParseStrategy } from 'text-to-mermaid';
@@ -13,11 +13,7 @@ interface SettingsDialogProps {
 export default function SettingsDialog({ isOpen, onClose }: SettingsDialogProps) {
     const [settings, setSettings] = useState<AppSettings>(AppSettingsService.getSettings());
 
-    useEffect(() => {
-        if (isOpen) {
-            setSettings(AppSettingsService.getSettings());
-        }
-    }, [isOpen]);
+    // Removed redundant useEffect (state initialized on mount)
 
     const handleSave = () => {
         AppSettingsService.saveSettings(settings);

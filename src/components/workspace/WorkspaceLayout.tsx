@@ -8,20 +8,18 @@ import './Workspace.css';
 export default function WorkspaceLayout() {
     const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
     const [rawText, setRawText] = useState(localStorage.getItem('articleText') || '');
-    const [sentences, setSentences] = useState<string[]>([]);
+    const [sentences, setSentences] = useState<string[]>(() => {
+        const text = localStorage.getItem('articleText') || '';
+        if (!text.trim()) return [];
+        const res = splitSentences(text);
+        return (res && res.length > 0) ? res : [text.trim()];
+    });
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isPlaying, setIsPlaying] = useState(false);
     const [wpm] = useState(200);
     const [isWholeTextMode, setIsWholeTextMode] = useState(false);
 
     const timerRef = useRef<number | null>(null);
-
-    // Initial parsing
-    useEffect(() => {
-        if (rawText) {
-            parseText(rawText);
-        }
-    }, []);
 
     // Effect to handle sentence parsing
     const parseText = (text: string) => {
@@ -40,6 +38,8 @@ export default function WorkspaceLayout() {
             setCurrentIndex(0);
         }
     };
+    // Removed redundant useEffect
+
 
     const handleTextProcess = (text: string) => {
         setRawText(text);
