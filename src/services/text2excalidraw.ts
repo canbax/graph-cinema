@@ -38,7 +38,7 @@ export function fixDiagramLayout(elements: OrderedExcalidrawElement[]): OrderedE
     const PADDING = 20;
     const MIN_WIDTH = 60;
     const MIN_HEIGHT = 40;
-    const TEXT_MIN_WIDTH = 40;
+    const TEXT_MIN_WIDTH = 10;
 
     // ---------------------------------------------------------
     // PRE-PROCESSING: Resize containers to fit text (Pass 0, 1, 2)
@@ -57,10 +57,12 @@ export function fixDiagramLayout(elements: OrderedExcalidrawElement[]): OrderedE
 
     // Pass 0: Unwrap text if necessary
     const textAdjustedElements = elements.map(el => {
-        if (el.type === "text" && (el as any).text && el.width < TEXT_MIN_WIDTH) {
-            const newWidth = Math.max(el.width, TEXT_MIN_WIDTH);
+        const elemText = (el as any).text;
+        if (el.type === "text" && elemText) {
+            const newWidth = TEXT_MIN_WIDTH * elemText.length;
+            if (el.width >= newWidth) return el;
             if (newWidth !== el.width) {
-                const estimatedLines = Math.max(1, Math.ceil(((el as any).text.length * 8) / newWidth));
+                const estimatedLines = Math.max(1, Math.ceil((elemText.length * 8) / newWidth));
                 const newHeight = estimatedLines * 20;
                 return { ...el, width: newWidth, height: newHeight };
             }
