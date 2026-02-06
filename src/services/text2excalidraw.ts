@@ -40,6 +40,17 @@ export function fixDiagramLayout(elements: OrderedExcalidrawElement[]): OrderedE
     const MIN_HEIGHT = 40;
     const TEXT_MIN_WIDTH = 10;
 
+    // CLEANUP: Sanitize text (remove newlines, trim, fix split words)
+    elements = elements.map(el => {
+        if (el.type === "text") {
+            let text = (el as any).text || "";
+            text = text.replace(/[\n\r]+/g, "");
+            text = text.trim();
+            return { ...el, text };
+        }
+        return el;
+    });
+
     // ---------------------------------------------------------
     // PRE-PROCESSING: Resize containers to fit text (Pass 0, 1, 2)
     // ---------------------------------------------------------

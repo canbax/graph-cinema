@@ -129,11 +129,6 @@ export default function ScriptSidebar({
                     </>
                 )}
 
-                {isWholeTextMode && (
-                    <div style={{ padding: '1rem', color: '#666', fontStyle: 'italic', textAlign: 'center' }}>
-                        Showing single diagram for entire text.
-                    </div>
-                )}
             </div>
 
 
