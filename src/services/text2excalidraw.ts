@@ -40,6 +40,10 @@ export function fixDiagramLayout(elements: OrderedExcalidrawElement[]): OrderedE
     const MIN_HEIGHT = 40;
     const TEXT_MIN_WIDTH = 40;
 
+    // ---------------------------------------------------------
+    // PRE-PROCESSING: Resize containers to fit text (Pass 0, 1, 2)
+    // ---------------------------------------------------------
+
     // Map container IDs to text elements
     const containerTextMap = new Map<string, OrderedExcalidrawElement>();
     elements.forEach(el => {
@@ -52,21 +56,12 @@ export function fixDiagramLayout(elements: OrderedExcalidrawElement[]): OrderedE
     const adjustments = new Map<string, { dx: number, dy: number }>();
 
     // Pass 0: Unwrap text if necessary
-    // If text is very narrow but has short content, force it wider to prevent wrapping
     const textAdjustedElements = elements.map(el => {
         if (el.type === "text" && (el as any).text && el.width < TEXT_MIN_WIDTH) {
-            // Check if text likely wraps efficiently. 
-            // For simple heuristics: if text length is small but width is tiny, force expand.
-            // Excalidraw effectively re-calculates dimensions if we don't provide them, 
-            // but here we have fixed dimensions from mermaid-to-excalidraw.
-            // We can't easily recalculate exact width without font metrics.
-            // BUT, we can just increase the width.
             const newWidth = Math.max(el.width, TEXT_MIN_WIDTH);
             if (newWidth !== el.width) {
-                // If we widen the text, we should probably reduce height, assuming it unwraps.
-                // This is an approximation. 
                 const estimatedLines = Math.max(1, Math.ceil(((el as any).text.length * 8) / newWidth));
-                const newHeight = estimatedLines * 20; // Approx 20px per line
+                const newHeight = estimatedLines * 20;
                 return { ...el, width: newWidth, height: newHeight };
             }
         }
@@ -81,16 +76,12 @@ export function fixDiagramLayout(elements: OrderedExcalidrawElement[]): OrderedE
         }
     });
 
-
     // Pass 1: Adjust containers and calculate needed shifts
     let elementsWithResizedContainers = textAdjustedElements.map(el => {
         if (["ellipse", "diamond", "rectangle"].includes(el.type)) {
             const textEl = containerTextMap.get(el.id);
             if (textEl) {
-                // Ellipses need more width to fit text in the center visually
                 const widthScale = el.type === "ellipse" ? 1.6 : 1.3;
-
-                // Calculate required dimensions
                 const requiredWidth = textEl.width * widthScale + PADDING;
                 const requiredHeight = textEl.height + PADDING * 2;
 
@@ -100,17 +91,14 @@ export function fixDiagramLayout(elements: OrderedExcalidrawElement[]): OrderedE
                 if (el.width < minWidth || el.height < minHeight) {
                     const oldWidth = el.width;
                     const oldHeight = el.height;
-
                     const newWidth = Math.max(el.width, minWidth);
                     const newHeight = Math.max(el.height, minHeight);
 
-                    // Calculate shift to keep centered relative to original position
                     const dx = (oldWidth - newWidth) / 2;
                     const dy = (oldHeight - newHeight) / 2;
 
                     adjustments.set(el.id, { dx, dy });
 
-                    // Return new object with updated properties
                     return {
                         ...el,
                         width: newWidth,
@@ -125,7 +113,7 @@ export function fixDiagramLayout(elements: OrderedExcalidrawElement[]): OrderedE
     });
 
     // Pass 2: Adjust text positions based on their container's adjustment
-    let elementsWithAdjustedText = elementsWithResizedContainers.map(el => {
+    let currentElements = elementsWithResizedContainers.map(el => {
         if (el.type === "text" && el.containerId) {
             const adj = adjustments.get(el.containerId);
             if (adj) {
@@ -139,104 +127,140 @@ export function fixDiagramLayout(elements: OrderedExcalidrawElement[]): OrderedE
         return el;
     });
 
-    // Pass 3: Collision Avoidance (Vertical only for now, simple)
-    // Sort by Y to handle top-down flow
-    // We only move things DOWN to avoid overlapping previous elements.
-    // Iterative approach: Check each element against all *previous* elements (that are higher).
-    // If overlap, move current element down.
+    // ---------------------------------------------------------
+    // NEW ALGORITHM: Top-down vertical collision resolution
+    // ---------------------------------------------------------
 
-    // Filter mainly nodes and text that are meaningful
-    const margin = 20;
-    const sortedIndices = elementsWithAdjustedText
-        .map((el, index) => ({ index, y: el.y }))
-        .sort((a, b) => a.y - b.y)
-        .map(item => item.index);
+    // Helper: Find element with lowest Y (visual top)
+    const findTopMostElement = (els: OrderedExcalidrawElement[]): OrderedExcalidrawElement | null => {
+        let topEl: OrderedExcalidrawElement | null = null;
+        let minY = Infinity;
 
-    const verticalShifts = new Map<string, number>(); // id -> shift
+        els.forEach(el => {
+            // Filter out purely decorative or structural elements if needed, 
+            // but usually we want the top meaningful node. 
+            // Ignoring lines/arrows for "top-most" check is usually safer for layout.
+            if (el.isDeleted) return;
+            if (el.type === "arrow" || el.type === "line") return;
 
-    // Helper to get shifted rect
-    const getRect = (el: any, shiftY: number = 0) => {
-        return {
-            x: el.x,
-            y: el.y + shiftY,
-            w: el.width,
-            h: el.height,
-            id: el.id
-        };
+            // Also ignore text that is bound to a container, rely on the container itself
+            if (el.type === "text" && el.containerId) return;
+
+            if (el.y < minY) {
+                minY = el.y;
+                topEl = el;
+            }
+        });
+        return topEl;
     };
 
-    const isOverlapping = (r1: any, r2: any) => {
-        return r1.x < r2.x + r2.w &&
-            r1.x + r1.w > r2.x &&
-            r1.y < r2.y + r2.h &&
-            r1.y + r1.h > r2.y;
+    // Helper: Check for vertical collision
+    // Returns negative value if collision (overlap amount), positive if safe distance.
+    // e1 is the element we are checking (the top element usually)
+    // e2 is the element we might collide with
+    const checkVerticalCollision = (
+        r1: { x: number, y: number, width: number, height: number },
+        r2: { x: number, y: number, width: number, height: number }
+    ): number => {
+        // Horizontal overlap check first
+        const horizontalOverlap =
+            r1.x < r2.x + r2.width &&
+            r1.x + r1.width > r2.x;
+
+        if (!horizontalOverlap) {
+            return 1; // Arbitrary positive number, no collision possible horizontally
+        }
+
+        // Check vertical overlap
+        // We assume r1 is "supposed" to be above r2 effectively, or we just check raw overlap.
+        // User asked: "determine if there is a collision... negative value... collision"
+
+        // Standard AABB overlap
+        const isOverlapping =
+            r1.y < r2.y + r2.height &&
+            r1.y + r1.height > r2.y;
+
+        if (isOverlapping) {
+            // Calculate overlap amount. 
+            // Since we want to move r1 UP, we care about how much r1's bottom is below r2's top.
+            // OR how much r1's top is below r2's bottom.
+
+            // Let's assume we want to know how deep the penetration is.
+            // Intersection height:
+            const overlapBottom = Math.min(r1.y + r1.height, r2.y + r2.height);
+            const overlapTop = Math.max(r1.y, r2.y);
+            const overlapHeight = overlapBottom - overlapTop;
+
+            return -overlapHeight;
+        }
+
+        // If no overlap, return distance
+        // This logic can be refined if we specifically check "is r1 above r2?"
+        return 1;
     };
 
-    for (let i = 0; i < sortedIndices.length; i++) {
-        const currIdx = sortedIndices[i];
-        const currEl = elementsWithAdjustedText[currIdx];
-        if (currEl.isDeleted) continue;
+    const topElement = findTopMostElement(currentElements);
 
-        // Skip edges/arrows for collision (they are hard to box)
-        if (currEl.type === "arrow" || currEl.type === "line") continue;
+    if (topElement) {
+        let maxOverlap = 0;
 
-        let currentShift = verticalShifts.get(currEl.id) || 0;
-        // Also inherit shift from container if text? No, text moves with container usually.
-        // If text is inside container, we moved it together.
-        // We generally treat container+text as one unit.
-        // If we move container, we must move text.
+        // Check collision against all other relevant elements
+        currentElements.forEach(otherEl => {
+            if (otherEl.id === topElement.id) return;
 
-        // Let's just resolve overlaps for Containers and "Free" Text.
-        // Text inside container doesn't collide with its own container.
+            // Ignore specialized elements for collision
+            if (otherEl.isDeleted) return;
 
-        if (currEl.type === "text" && currEl.containerId) continue; // Skip text inside container for collision check
+            // Check bound elements specifically as requested
+            // "Check if top most element vertically collides with any of it's boundElements"
+            // Excalidraw elements have `boundElements` property which is an array of {id, type}
 
-        let rect1 = getRect(currEl, currentShift);
+            // If it is bound, user wanted to check collision.
+            // If it is NOT bound, we also usually want to check collision to avoid overlapping unrelated nodes.
+            // The user prompt said: "Check if top most element vertically collides with any of it's `boundElements` and if there is a collision, move... up"
+            // It implied doing it FOR bound elements, but implicitly we should do it for others too if they overlap?
+            // "Write another function... to check if there is a vertical collisions... if neg... move top most element"
+            // Then purely "Also check if... boundElements...".
 
-        // Check against valid previous elements
-        for (let j = 0; j < i; j++) {
-            const prevIdx = sortedIndices[j];
-            const prevEl = elementsWithAdjustedText[prevIdx];
-            if (prevEl.isDeleted) continue;
-            if (prevEl.type === "arrow" || prevEl.type === "line") continue;
-            if (prevEl.type === "text" && prevEl.containerId) continue;
+            // I will apply collision check to ALL non-ignored elements, which covers bound elements too.
 
-            // Don't check text against its own container (already filtered by loop type check, but be safe)
-            // Don't check text against its own container (already filtered by loop type check, but be safe)
-            if ((currEl as any).containerId === prevEl.id) continue;
-            if ((prevEl as any).containerId === currEl.id) continue;
+            const collisionVal = checkVerticalCollision(
+                { x: topElement.x, y: topElement.y, width: topElement.width, height: topElement.height },
+                { x: otherEl.x, y: otherEl.y, width: otherEl.width, height: otherEl.height }
+            );
 
-            const prevShift = verticalShifts.get(prevEl.id) || 0;
-            const rect2 = getRect(prevEl, prevShift);
+            console.log("Collision value:", collisionVal);
 
-            if (isOverlapping(rect1, rect2)) {
-                // Overlap! Move currEl down.
-                const requiredY = rect2.y + rect2.h + margin;
-                const diff = requiredY - rect1.y;
-                if (diff > 0) {
-                    currentShift += diff;
-                    rect1.y += diff; // Update current rect for next checks
+            if (collisionVal < 0) {
+                // Keep track of the worst collision (most negative)
+                // We want the magnitude, so abs(collisionVal) is the push amount
+                if (Math.abs(collisionVal) > maxOverlap) {
+                    maxOverlap = Math.abs(collisionVal);
                 }
             }
+        });
+
+        if (maxOverlap > 0) {
+            // Move top element up
+            const shiftAmount = maxOverlap;
+
+            // Apply shift to topElement
+            // AND if topElement is a container, we must move its text too
+
+            adjustments.set(topElement.id, { dx: 0, dy: -shiftAmount });
+
+            return currentElements.map(el => {
+                if (el.id === topElement.id) {
+                    return { ...el, y: el.y - shiftAmount };
+                }
+                // If this is the text inside the top element
+                if (el.type === "text" && el.containerId === topElement.id) {
+                    return { ...el, y: el.y - shiftAmount };
+                }
+                return el;
+            });
         }
-        verticalShifts.set(currEl.id, currentShift);
     }
 
-    // Apply vertical shifts
-    return elementsWithAdjustedText.map(el => {
-        let shift = verticalShifts.get(el.id);
-
-        // If this is text inside a container, use container's shift
-        if (el.type === "text" && el.containerId) {
-            shift = verticalShifts.get(el.containerId);
-        }
-
-        if (shift && shift > 0) {
-            return {
-                ...el,
-                y: el.y + shift
-            };
-        }
-        return el;
-    });
+    return currentElements;
 }
