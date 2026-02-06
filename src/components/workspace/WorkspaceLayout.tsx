@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import ScriptSidebar from './ScriptSidebar';
 import CinemaCanvas from './CinemaCanvas';
 import TimelineController from './TimelineController';
+import { splitSentences } from '../../utils/sentenceSplitter';
 import './Workspace.css';
 
 export default function WorkspaceLayout() {
@@ -29,11 +30,10 @@ export default function WorkspaceLayout() {
             setSentences([]);
             return;
         }
-        // Basic parsing (same as ArticleReader)
-        const match = text.match(/[^.!?]+[.!?]+(\s|$)|[^.!?]+$/g);
-        if (match) {
-            const cleanSentences = match.map(s => s.trim()).filter(s => s.length > 0);
-            setSentences(cleanSentences);
+
+        const result = splitSentences(text);
+        if (result && result.length > 0) {
+            setSentences(result);
             setCurrentIndex(0);
         } else {
             setSentences([text.trim()]);

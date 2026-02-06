@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Play, Pause, SkipBack, SkipForward } from 'lucide-react';
 import './ArticleReader.css';
 import EditableSentence from './EditableSentence';
+import { splitSentences } from '../utils/sentenceSplitter';
 
 interface ArticleReaderProps {
     onSentenceChange?: (sentence: string) => void;
@@ -33,12 +34,10 @@ const ArticleReader = ({ onSentenceChange }: ArticleReaderProps) => {
             setSentences([]);
             return;
         }
-        // Split by . ! ? followed by space or end of string.
-        // Keeping the delimiter in the sentence would be nice but simple split is okay for now.
-        // Let's try to match sentence + delimiter.
-        const match = text.match(/[^.!?]+[.!?]+(\s|$)|[^.!?]+$/g);
-        if (match) {
-            setSentences(match.map(s => s.trim()));
+
+        const result = splitSentences(text);
+        if (result && result.length > 0) {
+            setSentences(result);
             setCurrentIndex(0);
         } else {
             setSentences([text]);
