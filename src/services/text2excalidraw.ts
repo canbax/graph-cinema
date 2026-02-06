@@ -229,7 +229,6 @@ export function fixDiagramLayout(elements: OrderedExcalidrawElement[]): OrderedE
                 { x: otherEl.x, y: otherEl.y, width: otherEl.width, height: otherEl.height }
             );
 
-            console.log("Collision value:", collisionVal);
 
             if (collisionVal < 0) {
                 // Keep track of the worst collision (most negative)
