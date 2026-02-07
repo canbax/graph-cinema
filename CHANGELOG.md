@@ -1,0 +1,27 @@
+## 0.0.1 (2026-02-07)
+
+### Features
+
+- Add Bottom Up (BT) and Right to Left (RL) layout direction options to settings and diagram generation. ([0eade00](https://github.com/canbax/graph-cinema/commit/0eade0040f107120318c1b13d7840c6e315a8831))
+- add settings dialog ([7ed9f65](https://github.com/canbax/graph-cinema/commit/7ed9f655331f0c524b9415f1c249348dacc52e0d))
+- Add TextImporter component for article input and storage, replacing direct input functionality in ArticleReader. ([4f11b8d](https://github.com/canbax/graph-cinema/commit/4f11b8d669f144484058fe7ccefe7178c27270d7))
+- Conditionally render Whiteboard and ArticleReader together after text processing. ([d9a2e02](https://github.com/canbax/graph-cinema/commit/d9a2e02fc0065506300b7ba1a28bdb24583ac545))
+- handle diving article into complex sentences ([3a098c3](https://github.com/canbax/graph-cinema/commit/3a098c3fc3b3fae0a24ca525d9f382a0bf22c1e0))
+- implement direct text conversion mode for generating a single diagram from the entire input. ([c3d46b8](https://github.com/canbax/graph-cinema/commit/c3d46b80b95e896dca0a46a3b170e46c93cb8bd6))
+- Introduce `EditableSentence` component and integrate it into `ArticleReader` to enable inline sentence editing. ([b0279eb](https://github.com/canbax/graph-cinema/commit/b0279ebe31fc44c6cab51f541f926f47232ef575))
+- introduce resizable whiteboard component with drag-to-resize functionality and remove article reader speed control. ([0a51fb5](https://github.com/canbax/graph-cinema/commit/0a51fb511108105b0c4e0eeae22b6358ce5cee5d))
+- introduce settings versioning to trigger whiteboard updates when settings are modified. ([62e9dab](https://github.com/canbax/graph-cinema/commit/62e9dab38eee6940e53e050e81442726b7c22986))
+- make settings button visible always and close on clicked outside ([84d5d7e](https://github.com/canbax/graph-cinema/commit/84d5d7ed48a23b9e198b0637fd98aaebd7385a70))
+- option to do left-to-right layout ([957b9de](https://github.com/canbax/graph-cinema/commit/957b9de227dce5c40bb55591e57e7835f9e2a259))
+- post processing to fix a bit overlaps but not enough ([15d9874](https://github.com/canbax/graph-cinema/commit/15d9874bafcb430536458f917c4539da4e854cda))
+- Replace boolean AI toggle with radio button ([cc510e3](https://github.com/canbax/graph-cinema/commit/cc510e350b9ab708513c32bcb5bd10f521bcb2ef))
+- Replace text-based ArticleReader controls with Lucide icons and update button styling. ([401ebe7](https://github.com/canbax/graph-cinema/commit/401ebe71c153a80fc459f545fd37c3f051a1cee2))
+- update texts of convert buttons ([1e9fbdd](https://github.com/canbax/graph-cinema/commit/1e9fbdd5f3ddee2e46db8f0949cae16d3a9f4da1))
+
+### Bug Fixes
+
+- better width estimation from text length ([f8b139b](https://github.com/canbax/graph-cinema/commit/f8b139bd59f06a702d5b01a590e366b54b01710b))
+- call text-to-excalidraw properly ([c82484c](https://github.com/canbax/graph-cinema/commit/c82484ce288719201cffee1444f5f97989eb75e6))
+- delete log ([fe21a58](https://github.com/canbax/graph-cinema/commit/fe21a5830b85012e1673691d884d9a4ad9db893f))
+- move top-most element if needed ([dcb0e94](https://github.com/canbax/graph-cinema/commit/dcb0e94c69f4743e12be98936f7cbe448cc5bd2d))
+- text becoming multi-line ([ded9868](https://github.com/canbax/graph-cinema/commit/ded9868420a7f40b3d99c93b76cf86eef09aece6))
