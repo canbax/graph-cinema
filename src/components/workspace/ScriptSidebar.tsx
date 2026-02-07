@@ -13,6 +13,7 @@ interface ScriptSidebarProps {
     isCollapsed: boolean;
     toggleSidebar: () => void;
     isWholeTextMode?: boolean;
+    onSettingsChange?: () => void;
 }
 
 export default function ScriptSidebar({
@@ -24,7 +25,8 @@ export default function ScriptSidebar({
     initialText = '',
     isCollapsed,
     toggleSidebar,
-    isWholeTextMode = false
+    isWholeTextMode = false,
+    onSettingsChange
 }: ScriptSidebarProps) {
     const [rawText, setRawText] = useState(initialText);
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -63,6 +65,7 @@ export default function ScriptSidebar({
                 <SettingsDialog
                     isOpen={isSettingsOpen}
                     onClose={() => setIsSettingsOpen(false)}
+                    onSettingsChange={onSettingsChange}
                 />
             </div >
         );
@@ -137,6 +140,7 @@ export default function ScriptSidebar({
             <SettingsDialog
                 isOpen={isSettingsOpen}
                 onClose={() => setIsSettingsOpen(false)}
+                onSettingsChange={onSettingsChange}
             />
         </div >
     );

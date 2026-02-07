@@ -2,9 +2,10 @@ import Whiteboard from '../Whiteboard';
 
 interface CinemaCanvasProps {
     currentSentence: string;
+    settingsVersion?: number;
 }
 
-export default function CinemaCanvas({ currentSentence }: CinemaCanvasProps) {
+export default function CinemaCanvas({ currentSentence, settingsVersion }: CinemaCanvasProps) {
     return (
         <div className="cinema-canvas">
             {currentSentence ? (
@@ -17,7 +18,10 @@ export default function CinemaCanvas({ currentSentence }: CinemaCanvasProps) {
                         so we'll need to check that.
                         For now, assuming Whiteboard renders well in a container.
                      */}
-                    <Whiteboard currentSentence={currentSentence} />
+                    <Whiteboard
+                        currentSentence={currentSentence}
+                        settingsVersion={settingsVersion}
+                    />
                 </div>
             ) : (
                 <div className="canvas-placeholder">

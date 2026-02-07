@@ -8,15 +8,19 @@ import { AppSettingsService, type AppSettings } from '../../services/AppSettings
 interface SettingsDialogProps {
     isOpen: boolean;
     onClose: () => void;
+    onSettingsChange?: () => void;
 }
 
-export default function SettingsDialog({ isOpen, onClose }: SettingsDialogProps) {
+export default function SettingsDialog({ isOpen, onClose, onSettingsChange }: SettingsDialogProps) {
     const [settings, setSettings] = useState<AppSettings>(AppSettingsService.getSettings());
 
     // Removed redundant useEffect (state initialized on mount)
 
     const handleSave = () => {
         AppSettingsService.saveSettings(settings);
+        if (onSettingsChange) {
+            onSettingsChange();
+        }
         onClose();
     };
 

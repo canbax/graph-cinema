@@ -6,9 +6,10 @@ import type { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
 
 interface WhiteboardProps {
   currentSentence?: string;
+  settingsVersion?: number;
 }
 
-export default function Whiteboard({ currentSentence }: WhiteboardProps) {
+export default function Whiteboard({ currentSentence, settingsVersion }: WhiteboardProps) {
   const [height, setHeight] = useState(500);
   const [excalidrawAPI, setExcalidrawAPI] = useState<ExcalidrawImperativeAPI | null>(null);
   const isDraggingRef = useRef<'top' | 'bottom' | null>(null);
@@ -32,7 +33,7 @@ export default function Whiteboard({ currentSentence }: WhiteboardProps) {
 
     generate();
 
-  }, [currentSentence, excalidrawAPI]);
+  }, [currentSentence, excalidrawAPI, settingsVersion]);
 
 
   const handleMouseDown = (e: React.MouseEvent) => {

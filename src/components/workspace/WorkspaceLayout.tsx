@@ -18,8 +18,13 @@ export default function WorkspaceLayout() {
     const [isPlaying, setIsPlaying] = useState(false);
     const [wpm] = useState(200);
     const [isWholeTextMode, setIsWholeTextMode] = useState(false);
+    const [settingsVersion, setSettingsVersion] = useState(0);
 
     const timerRef = useRef<number | null>(null);
+
+    const handleSettingsChange = () => {
+        setSettingsVersion(v => v + 1);
+    };
 
     // Effect to handle sentence parsing
     const parseText = (text: string) => {
@@ -104,10 +109,12 @@ export default function WorkspaceLayout() {
                 isCollapsed={isSidebarCollapsed}
                 toggleSidebar={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
                 isWholeTextMode={isWholeTextMode}
+                onSettingsChange={handleSettingsChange}
             />
 
             <CinemaCanvas
                 currentSentence={sentences[currentIndex] || ''}
+                settingsVersion={settingsVersion}
             />
 
             {!isWholeTextMode && (
