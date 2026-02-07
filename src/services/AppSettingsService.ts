@@ -4,6 +4,7 @@ export interface AppSettings {
     parseStrategy: ParseStrategy;
     aiBaseUrl?: string;
     aiApiKey?: string;
+    layoutDirection: 'TD' | 'LR';
 }
 
 const SETTINGS_KEY = 'app_settings';
@@ -12,6 +13,7 @@ const DEFAULT_SETTINGS: AppSettings = {
     parseStrategy: ParseStrategy.Deterministic,
     aiBaseUrl: '',
     aiApiKey: '',
+    layoutDirection: 'TD',
 };
 
 export const AppSettingsService = {

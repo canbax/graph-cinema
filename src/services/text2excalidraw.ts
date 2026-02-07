@@ -19,13 +19,24 @@ export async function generateGraphFromSentence(sentence: string): Promise<Order
             }
         };
 
-        const text = await textToMermaid(sentence, options);
+        const layoutDirection = settings.layoutDirection || 'TD';
+
+        let text = await textToMermaid(sentence, options);
         if (!text) {
             throw new Error("No mermaid text generated");
         }
 
-        const excalidraw = await parseMermaidToExcalidraw(text);
+        // Apply layout direction override
+        // Handle both 'graph' and 'flowchart' keywords
+        // Replace existing direction (TD, TB, LR, RL) with user preference
+        const targetDirection = layoutDirection === 'LR' ? 'LR' : 'TD';
 
+        text = text.replace(
+            /(graph|flowchart)\s+(TD|TB|LR|RL)/,
+            (_match, keyword) => `${keyword} ${targetDirection}`
+        );
+
+        const excalidraw = await parseMermaidToExcalidraw(text);
         const elements = convertToExcalidrawElements(excalidraw.elements);
         return fixDiagramLayout(elements);
     } catch (error) {

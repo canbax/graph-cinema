@@ -138,6 +138,34 @@ export default function SettingsDialog({ isOpen, onClose }: SettingsDialogProps)
                         )}
                     </div>
 
+                    <div className="form-group" style={{ marginBottom: '15px' }}>
+                        <label style={{ display: 'block', marginBottom: '10px', fontWeight: 'bold' }}>Layout Direction</label>
+                        <div style={{ display: 'flex', gap: '20px' }}>
+                            <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+                                <input
+                                    type="radio"
+                                    name="layoutDirection"
+                                    value="TD"
+                                    checked={settings.layoutDirection === 'TD' || !settings.layoutDirection}
+                                    onChange={() => setSettings({ ...settings, layoutDirection: 'TD' })}
+                                    style={{ marginRight: '10px' }}
+                                />
+                                Top Down (TD)
+                            </label>
+                            <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+                                <input
+                                    type="radio"
+                                    name="layoutDirection"
+                                    value="LR"
+                                    checked={settings.layoutDirection === 'LR'}
+                                    onChange={() => setSettings({ ...settings, layoutDirection: 'LR' })}
+                                    style={{ marginRight: '10px' }}
+                                />
+                                Left to Right (LR)
+                            </label>
+                        </div>
+                    </div>
+
                     <div className="settings-footer" style={{
                         display: 'flex',
                         justifyContent: 'flex-end',
