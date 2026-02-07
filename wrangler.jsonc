@@ -1,0 +1,10 @@
+{
+    "name": "graph-cinema",
+    "compatibility_date": "2025-02-07",
+    "assets": {
+        "directory": "./dist"
+    },
+    "observability": {
+        "enabled": true
+    }
+}

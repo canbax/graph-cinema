@@ -6,13 +6,15 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "deploy": "npm run build && wrangler deploy",
     "lint": "eslint .",
     "changelog": "conventional-changelog -p conventionalcommits -i CHANGELOG.md -r 0 -s",
     "preview": "vite preview",
     "test-watch": "vitest",
     "test": "vitest run",
     "checks": "npm run format && npm run lint && npm run test",
-    "prepare": "husky"
+    "prepare": "husky",
+    "dev-server": "wrangler dev"
   },
   "lint-staged": {
     "**/*.{js,jsx,ts,tsx,vue,astro,svelte,json,md}": [
@@ -54,6 +56,7 @@
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.46.4",
     "vite": "^7.2.4",
-    "vitest": "^4.0.18"
+    "vitest": "^4.0.18",
+    "wrangler": "^4.63.0"
   }
 }
