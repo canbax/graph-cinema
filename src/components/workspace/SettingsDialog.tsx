@@ -144,7 +144,7 @@ export default function SettingsDialog({ isOpen, onClose, onSettingsChange }: Se
 
                     <div className="form-group" style={{ marginBottom: '15px' }}>
                         <label style={{ display: 'block', marginBottom: '10px', fontWeight: 'bold' }}>Layout Direction</label>
-                        <div style={{ display: 'flex', gap: '20px' }}>
+                        <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
                             <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
                                 <input
                                     type="radio"
@@ -166,6 +166,28 @@ export default function SettingsDialog({ isOpen, onClose, onSettingsChange }: Se
                                     style={{ marginRight: '10px' }}
                                 />
                                 Left to Right (LR)
+                            </label>
+                            <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+                                <input
+                                    type="radio"
+                                    name="layoutDirection"
+                                    value="BT"
+                                    checked={settings.layoutDirection === 'BT'}
+                                    onChange={() => setSettings({ ...settings, layoutDirection: 'BT' })}
+                                    style={{ marginRight: '10px' }}
+                                />
+                                Bottom Up (BT)
+                            </label>
+                            <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+                                <input
+                                    type="radio"
+                                    name="layoutDirection"
+                                    value="RL"
+                                    checked={settings.layoutDirection === 'RL'}
+                                    onChange={() => setSettings({ ...settings, layoutDirection: 'RL' })}
+                                    style={{ marginRight: '10px' }}
+                                />
+                                Right to Left (RL)
                             </label>
                         </div>
                     </div>

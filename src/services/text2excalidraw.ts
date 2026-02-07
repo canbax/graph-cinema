@@ -29,10 +29,10 @@ export async function generateGraphFromSentence(sentence: string): Promise<Order
         // Apply layout direction override
         // Handle both 'graph' and 'flowchart' keywords
         // Replace existing direction (TD, TB, LR, RL) with user preference
-        const targetDirection = layoutDirection === 'LR' ? 'LR' : 'TD';
+        const targetDirection = layoutDirection;
 
         text = text.replace(
-            /(graph|flowchart)\s+(TD|TB|LR|RL)/,
+            /(graph|flowchart)\s+(TD|TB|LR|RL|BT)/,
             (_match, keyword) => `${keyword} ${targetDirection}`
         );
 

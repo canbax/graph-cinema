@@ -4,7 +4,7 @@ export interface AppSettings {
     parseStrategy: ParseStrategy;
     aiBaseUrl?: string;
     aiApiKey?: string;
-    layoutDirection: 'TD' | 'LR';
+    layoutDirection: 'TD' | 'LR' | 'BT' | 'RL';
 }
 
 const SETTINGS_KEY = 'app_settings';
