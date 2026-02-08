@@ -1,13 +1,21 @@
 import Whiteboard from "../Whiteboard";
 
+import type { ExcalidrawElement } from "@excalidraw/excalidraw/element/types";
+
 interface CinemaCanvasProps {
   currentSentence: string;
   settingsVersion?: number;
+  currentIndex: number;
+  onSceneUpdate: (index: number, elements: ExcalidrawElement[]) => void;
+  getSceneElements: (index: number) => ExcalidrawElement[];
 }
 
 export default function CinemaCanvas({
   currentSentence,
   settingsVersion,
+  currentIndex,
+  onSceneUpdate,
+  getSceneElements,
 }: CinemaCanvasProps) {
   return (
     <div className="cinema-canvas">
@@ -24,6 +32,9 @@ export default function CinemaCanvas({
           <Whiteboard
             currentSentence={currentSentence}
             settingsVersion={settingsVersion}
+            currentIndex={currentIndex}
+            onSceneUpdate={onSceneUpdate}
+            getSceneElements={getSceneElements}
           />
         </div>
       ) : (

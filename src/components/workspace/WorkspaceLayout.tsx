@@ -1,9 +1,10 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import ScriptSidebar from "./ScriptSidebar";
 import CinemaCanvas from "./CinemaCanvas";
 import TimelineController from "./TimelineController";
 import { splitSentences } from "../../utils/sentenceSplitter";
 import { AppSettingsService } from "../../services/AppSettingsService";
+import type { ExcalidrawElement } from "@excalidraw/excalidraw/element/types";
 import "./Workspace.css";
 
 export default function WorkspaceLayout() {
@@ -23,12 +24,26 @@ export default function WorkspaceLayout() {
   const [isWholeTextMode, setIsWholeTextMode] = useState(false);
   const [settingsVersion, setSettingsVersion] = useState(0);
 
+  // Store elements for each scene: sceneIndex -> elements
+  const sceneElementsRef = useRef<Record<number, ExcalidrawElement[]>>({});
+
   const timerRef = useRef<number | null>(null);
 
   const handleSettingsChange = () => {
     setSettingsVersion((v) => v + 1);
     setWpm(AppSettingsService.getSettings().wpm || 200);
   };
+
+  const handleSceneUpdate = useCallback(
+    (index: number, elements: ExcalidrawElement[]) => {
+      sceneElementsRef.current[index] = elements;
+    },
+    [],
+  );
+
+  const getSceneElements = useCallback((index: number) => {
+    return sceneElementsRef.current[index];
+  }, []);
 
   // Effect to handle sentence parsing
   const parseText = (text: string) => {
@@ -120,6 +135,9 @@ export default function WorkspaceLayout() {
       <CinemaCanvas
         currentSentence={sentences[currentIndex] || ""}
         settingsVersion={settingsVersion}
+        currentIndex={currentIndex}
+        onSceneUpdate={handleSceneUpdate}
+        getSceneElements={getSceneElements}
       />
 
       {!isWholeTextMode && (

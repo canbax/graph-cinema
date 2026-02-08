@@ -4,15 +4,22 @@ import { generateGraphFromSentence } from "../services/text2excalidraw";
 import { emojifySentence } from "../utils/emojiMapper";
 import "./Whiteboard.css";
 import type { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
+import type { ExcalidrawElement } from "@excalidraw/excalidraw/element/types";
 
 interface WhiteboardProps {
   currentSentence?: string;
   settingsVersion?: number;
+  currentIndex: number;
+  onSceneUpdate: (index: number, elements: ExcalidrawElement[]) => void;
+  getSceneElements: (index: number) => ExcalidrawElement[];
 }
 
 export default function Whiteboard({
   currentSentence,
   settingsVersion,
+  currentIndex,
+  onSceneUpdate,
+  getSceneElements,
 }: WhiteboardProps) {
   const [height, setHeight] = useState(500);
   const [excalidrawAPI, setExcalidrawAPI] =
@@ -21,48 +28,52 @@ export default function Whiteboard({
   const startYRef = useRef(0);
   const startHeightRef = useRef(0);
 
+  // Debounce ref to avoid too many updates
+  const updateTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   useEffect(() => {
     if (!currentSentence || !excalidrawAPI) return;
 
-    const generate = async () => {
+    const generateOrLoad = async () => {
       try {
+        // 1. Check if we have cached elements for this scene
+        const cachedElements = getSceneElements(currentIndex);
+
+        if (cachedElements && cachedElements.length > 0) {
+          // Restore from cache
+          excalidrawAPI.updateScene({ elements: cachedElements });
+          // Ideally invoke scrollToContent if you want to reset view, or store view state too
+          // For now, let's fit to content to ensure visibility
+          excalidrawAPI.scrollToContent(cachedElements, { fitToContent: true });
+          return;
+        }
+
+        // 2. No cache, generate new
         const fullElements = await generateGraphFromSentence(currentSentence);
         if (!fullElements || fullElements.length === 0) return;
 
-        // 1. Set the view based on the full graph so it doesn't jump around
+        // Save initial state to cache
+        onSceneUpdate(currentIndex, fullElements);
+
+        // 3. Set the view based on the full graph
         excalidrawAPI.scrollToContent(fullElements, { fitToContent: true });
 
-        // 2. Clear scene initially
+        // 4. Animation Logic
         excalidrawAPI.updateScene({ elements: [] });
 
-        // 3. Group elements for animation
-        // We want to draw nodes first, then arrows
         const nodes: typeof fullElements = [];
         const arrows: typeof fullElements = [];
-
-        // Helper to check if an element is an arrow/line
         const isArrow = (type: string) => type === "arrow" || type === "line";
 
         fullElements.forEach((el) => {
           if (isArrow(el.type)) {
             arrows.push(el);
           } else {
-            // It's a node or text
             nodes.push(el);
           }
         });
 
-        // 4. Animation Settings
         const TOTAL_DURATION_MS = 1000;
-
-        // Combine into a sequence: Nodes first, then Arrows
-        // We simply slice the full arrays over time
-        // However, we want "groups" to appear together (container + text)
-        // Since we didn't implement complex grouping map logic yet,
-        // we can rely on the fact that text usually follows container in our generation,
-        // or just accept that text might pop in 1 frame later (16ms difference is negligible).
-        // A simple "percentage relative" approach works well enough for "liveliness".
-
         const allSorted = [...nodes, ...arrows];
         const totalElements = allSorted.length;
 
@@ -73,15 +84,16 @@ export default function Whiteboard({
           if (!startTime) startTime = timestamp;
           const elapsed = timestamp - startTime;
           const progress = Math.min(elapsed / TOTAL_DURATION_MS, 1);
-
-          // Calculate how many elements to show based on progress
-          // Ease out cubic for nicer feel: 1 - pow(1 - x, 3)
           const easeProgress = 1 - Math.pow(1 - progress, 3);
           const countToShow = Math.ceil(easeProgress * totalElements);
-
           const currentVisible = allSorted.slice(0, countToShow);
 
           excalidrawAPI.updateScene({ elements: currentVisible });
+
+          // Update cache with currently visible elements if animation finishes
+          if (progress === 1) {
+            onSceneUpdate(currentIndex, fullElements);
+          }
 
           if (progress < 1) {
             animationFrameId = requestAnimationFrame(animate);
@@ -98,8 +110,25 @@ export default function Whiteboard({
       }
     };
 
-    generate();
-  }, [currentSentence, excalidrawAPI, settingsVersion]);
+    generateOrLoad();
+  }, [
+    currentSentence,
+    excalidrawAPI,
+    settingsVersion,
+    currentIndex,
+    getSceneElements,
+    onSceneUpdate,
+  ]);
+
+  const handleChange = (elements: readonly ExcalidrawElement[]) => {
+    if (updateTimeoutRef.current) {
+      clearTimeout(updateTimeoutRef.current);
+    }
+
+    updateTimeoutRef.current = setTimeout(() => {
+      onSceneUpdate(currentIndex, [...elements]);
+    }, 500);
+  };
 
   const handleMouseDown = (e: React.MouseEvent) => {
     isDraggingRef.current = "bottom";
@@ -132,13 +161,12 @@ export default function Whiteboard({
     const elements = excalidrawAPI.getSceneElements();
     const updatedElements = elements.map((el) => {
       if (el.type === "text") {
-        // preserve original text if redundant
         const newText = emojifySentence(el.text);
         if (newText !== el.text) {
           return {
             ...el,
             text: newText,
-            originalText: newText, // Update original text too if present
+            originalText: newText,
           };
         }
       }
@@ -151,7 +179,10 @@ export default function Whiteboard({
   return (
     <div className="whiteboard-container" style={{ height: `${height}px` }}>
       <div className="whiteboard-content">
-        <Excalidraw excalidrawAPI={(api) => setExcalidrawAPI(api)}>
+        <Excalidraw
+          excalidrawAPI={(api) => setExcalidrawAPI(api)}
+          onChange={handleChange}
+        >
           <MainMenu>
             <MainMenu.Item onSelect={handleEmojify}>Emojify</MainMenu.Item>
             <MainMenu.Separator />
