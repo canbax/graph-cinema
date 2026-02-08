@@ -65,18 +65,19 @@ export default function WorkspaceLayout() {
   // Removed redundant useEffect
 
   const handleTextProcess = (text: string) => {
+    setIsWholeTextMode(false);
     setRawText(text);
     parseText(text);
     setIsPlaying(false); // Stop playback on new text
-    setIsWholeTextMode(false);
   };
 
   const handleDirectConvert = (text: string) => {
+    sceneElementsRef.current = {};
+    setIsWholeTextMode(true);
     setRawText(text);
     setSentences([text]);
     setCurrentIndex(0);
     setIsPlaying(false);
-    setIsWholeTextMode(true);
   };
 
   // Playback Logic
