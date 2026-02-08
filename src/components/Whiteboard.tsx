@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Excalidraw } from "@excalidraw/excalidraw";
+import { Excalidraw, MainMenu } from "@excalidraw/excalidraw";
 import { generateGraphFromSentence } from "../services/text2excalidraw";
 import "./Whiteboard.css";
 import type { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
@@ -9,10 +9,14 @@ interface WhiteboardProps {
   settingsVersion?: number;
 }
 
-export default function Whiteboard({ currentSentence, settingsVersion }: WhiteboardProps) {
+export default function Whiteboard({
+  currentSentence,
+  settingsVersion,
+}: WhiteboardProps) {
   const [height, setHeight] = useState(500);
-  const [excalidrawAPI, setExcalidrawAPI] = useState<ExcalidrawImperativeAPI | null>(null);
-  const isDraggingRef = useRef<'top' | 'bottom' | null>(null);
+  const [excalidrawAPI, setExcalidrawAPI] =
+    useState<ExcalidrawImperativeAPI | null>(null);
+  const isDraggingRef = useRef<"top" | "bottom" | null>(null);
   const startYRef = useRef(0);
   const startHeightRef = useRef(0);
 
@@ -32,41 +36,56 @@ export default function Whiteboard({ currentSentence, settingsVersion }: Whitebo
     };
 
     generate();
-
   }, [currentSentence, excalidrawAPI, settingsVersion]);
 
-
   const handleMouseDown = (e: React.MouseEvent) => {
-    isDraggingRef.current = 'bottom';
+    isDraggingRef.current = "bottom";
     startYRef.current = e.clientY;
     startHeightRef.current = height;
-    document.body.style.cursor = 'ns-resize';
+    document.body.style.cursor = "ns-resize";
     e.preventDefault();
 
     const onMouseMove = (me: MouseEvent) => {
       if (!isDraggingRef.current) return;
       const delta = me.clientY - startYRef.current;
-      if (isDraggingRef.current === 'bottom') {
+      if (isDraggingRef.current === "bottom") {
         setHeight(Math.max(200, startHeightRef.current + delta));
       }
     };
 
     const onMouseUp = () => {
       isDraggingRef.current = null;
-      document.body.style.cursor = '';
-      window.removeEventListener('mousemove', onMouseMove);
-      window.removeEventListener('mouseup', onMouseUp);
+      document.body.style.cursor = "";
+      window.removeEventListener("mousemove", onMouseMove);
+      window.removeEventListener("mouseup", onMouseUp);
     };
 
-    window.addEventListener('mousemove', onMouseMove);
-    window.addEventListener('mouseup', onMouseUp);
+    window.addEventListener("mousemove", onMouseMove);
+    window.addEventListener("mouseup", onMouseUp);
   };
 
   return (
     <div className="whiteboard-container" style={{ height: `${height}px` }}>
-
       <div className="whiteboard-content">
-        <Excalidraw excalidrawAPI={(api) => setExcalidrawAPI(api)} />
+        <Excalidraw excalidrawAPI={(api) => setExcalidrawAPI(api)}>
+          <MainMenu>
+            <MainMenu.Item onSelect={() => window.alert("Item1")}>
+              Item1
+            </MainMenu.Item>
+            <MainMenu.Separator />
+            <MainMenu.DefaultItems.LoadScene />
+            <MainMenu.DefaultItems.SaveToActiveFile />
+            <MainMenu.DefaultItems.Export />
+            <MainMenu.DefaultItems.SaveAsImage />
+            <MainMenu.DefaultItems.CommandPalette />
+            <MainMenu.DefaultItems.SearchMenu />
+            <MainMenu.DefaultItems.Help />
+            <MainMenu.DefaultItems.ClearCanvas />
+            <MainMenu.Separator />
+            <MainMenu.DefaultItems.ToggleTheme />
+            <MainMenu.DefaultItems.ChangeCanvasBackground />
+          </MainMenu>
+        </Excalidraw>
       </div>
 
       <div
