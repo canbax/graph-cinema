@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Excalidraw, MainMenu } from "@excalidraw/excalidraw";
 import { generateGraphFromSentence } from "../services/text2excalidraw";
+import { emojifySentence } from "../utils/emojiMapper";
 import "./Whiteboard.css";
 import type { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
 
@@ -36,7 +37,6 @@ export default function Whiteboard({
 
         // 3. Group elements for animation
         // We want to draw nodes first, then arrows
-
         const nodes: typeof fullElements = [];
         const arrows: typeof fullElements = [];
 
@@ -127,14 +127,33 @@ export default function Whiteboard({
     window.addEventListener("mouseup", onMouseUp);
   };
 
+  const handleEmojify = () => {
+    if (!excalidrawAPI) return;
+    const elements = excalidrawAPI.getSceneElements();
+    const updatedElements = elements.map((el) => {
+      if (el.type === "text") {
+        // preserve original text if redundant
+        const newText = emojifySentence(el.text);
+        if (newText !== el.text) {
+          return {
+            ...el,
+            text: newText,
+            originalText: newText, // Update original text too if present
+          };
+        }
+      }
+      return el;
+    });
+
+    excalidrawAPI.updateScene({ elements: updatedElements });
+  };
+
   return (
     <div className="whiteboard-container" style={{ height: `${height}px` }}>
       <div className="whiteboard-content">
         <Excalidraw excalidrawAPI={(api) => setExcalidrawAPI(api)}>
           <MainMenu>
-            <MainMenu.Item onSelect={() => window.alert("Item1")}>
-              Item1
-            </MainMenu.Item>
+            <MainMenu.Item onSelect={handleEmojify}>Emojify</MainMenu.Item>
             <MainMenu.Separator />
             <MainMenu.DefaultItems.LoadScene />
             <MainMenu.DefaultItems.SaveToActiveFile />
