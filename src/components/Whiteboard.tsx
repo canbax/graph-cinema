@@ -25,11 +25,74 @@ export default function Whiteboard({
 
     const generate = async () => {
       try {
-        const graphData = await generateGraphFromSentence(currentSentence);
-        if (graphData) {
-          excalidrawAPI.updateScene({ elements: graphData });
-          excalidrawAPI.scrollToContent(graphData, { fitToContent: true });
-        }
+        const fullElements = await generateGraphFromSentence(currentSentence);
+        if (!fullElements || fullElements.length === 0) return;
+
+        // 1. Set the view based on the full graph so it doesn't jump around
+        excalidrawAPI.scrollToContent(fullElements, { fitToContent: true });
+
+        // 2. Clear scene initially
+        excalidrawAPI.updateScene({ elements: [] });
+
+        // 3. Group elements for animation
+        // We want to draw nodes first, then arrows
+
+        const nodes: typeof fullElements = [];
+        const arrows: typeof fullElements = [];
+
+        // Helper to check if an element is an arrow/line
+        const isArrow = (type: string) => type === "arrow" || type === "line";
+
+        fullElements.forEach((el) => {
+          if (isArrow(el.type)) {
+            arrows.push(el);
+          } else {
+            // It's a node or text
+            nodes.push(el);
+          }
+        });
+
+        // 4. Animation Settings
+        const TOTAL_DURATION_MS = 1000;
+
+        // Combine into a sequence: Nodes first, then Arrows
+        // We simply slice the full arrays over time
+        // However, we want "groups" to appear together (container + text)
+        // Since we didn't implement complex grouping map logic yet,
+        // we can rely on the fact that text usually follows container in our generation,
+        // or just accept that text might pop in 1 frame later (16ms difference is negligible).
+        // A simple "percentage relative" approach works well enough for "liveliness".
+
+        const allSorted = [...nodes, ...arrows];
+        const totalElements = allSorted.length;
+
+        let startTime: number | null = null;
+        let animationFrameId: number;
+
+        const animate = (timestamp: number) => {
+          if (!startTime) startTime = timestamp;
+          const elapsed = timestamp - startTime;
+          const progress = Math.min(elapsed / TOTAL_DURATION_MS, 1);
+
+          // Calculate how many elements to show based on progress
+          // Ease out cubic for nicer feel: 1 - pow(1 - x, 3)
+          const easeProgress = 1 - Math.pow(1 - progress, 3);
+          const countToShow = Math.ceil(easeProgress * totalElements);
+
+          const currentVisible = allSorted.slice(0, countToShow);
+
+          excalidrawAPI.updateScene({ elements: currentVisible });
+
+          if (progress < 1) {
+            animationFrameId = requestAnimationFrame(animate);
+          }
+        };
+
+        animationFrameId = requestAnimationFrame(animate);
+
+        return () => {
+          if (animationFrameId) cancelAnimationFrame(animationFrameId);
+        };
       } catch (error) {
         console.error("Failed to generate graph", error);
       }
