@@ -343,6 +343,38 @@ export default function SettingsDialog({
             </div>
           </div>
 
+          <div className="form-group" style={{ marginBottom: "15px" }}>
+            <label
+              htmlFor="wpm"
+              style={{
+                display: "block",
+                marginBottom: "10px",
+                fontWeight: "bold",
+              }}
+            >
+              Words Per Minute (WPM)
+            </label>
+            <input
+              id="wpm"
+              type="number"
+              min="1"
+              max="1000"
+              value={settings.wpm || 200}
+              onChange={(e) =>
+                setSettings({
+                  ...settings,
+                  wpm: parseInt(e.target.value) || 200,
+                })
+              }
+              style={{
+                width: "100%",
+                padding: "8px",
+                borderRadius: "4px",
+                border: "1px solid #ccc",
+              }}
+            />
+          </div>
+
           <div
             className="settings-footer"
             style={{
