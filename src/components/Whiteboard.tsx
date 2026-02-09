@@ -21,7 +21,7 @@ export default function Whiteboard({
   onSceneUpdate,
   getSceneElements,
 }: WhiteboardProps) {
-  const [height, setHeight] = useState(500);
+  const [height, setHeight] = useState(1000);
   const [excalidrawAPI, setExcalidrawAPI] =
     useState<ExcalidrawImperativeAPI | null>(null);
   const isDraggingRef = useRef<"top" | "bottom" | null>(null);

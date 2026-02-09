@@ -65,6 +65,7 @@ export default function WorkspaceLayout() {
   // Removed redundant useEffect
 
   const handleTextProcess = (text: string) => {
+    sceneElementsRef.current = {};
     setIsWholeTextMode(false);
     setRawText(text);
     parseText(text);
