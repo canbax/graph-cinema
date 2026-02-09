@@ -30,6 +30,7 @@ export default function WorkspaceLayout() {
   const timerRef = useRef<number | null>(null);
 
   const handleSettingsChange = () => {
+    sceneElementsRef.current = {};
     setSettingsVersion((v) => v + 1);
     setWpm(AppSettingsService.getSettings().wpm || 200);
   };
