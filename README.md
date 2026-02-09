@@ -2,6 +2,8 @@
 
 GraphCinema is a tool that transforms natural language text into whiteboard diagrams. It serves as a bridge between storytelling and diagramming, allowing users to visualize narratives sentence-by-sentence or as a whole. It's main principle is "What You See Is What You Code"
 
+It uses [text-to-mermaid library](https://github.com/canbax/text-to-mermaid) to convert text to mermaid diagrams. And then it uses @excalidraw/mermaid-to-excalidraw library to convert mermaid diagrams to excalidraw diagrams.
+
 ## 🚀 Features
 
 - **Text-to-Graph Conversion**: Instantly converts text descriptions into Mermaid.js graphs and renders them as hand-drawn Excalidraw diagrams.
