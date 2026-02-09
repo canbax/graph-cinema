@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { Excalidraw, MainMenu } from "@excalidraw/excalidraw";
 import { generateGraphFromSentence } from "../services/text2excalidraw";
 import { emojifySentence } from "../utils/emojiMapper";
+import LoadingBar from "./common/LoadingBar";
 import "./Whiteboard.css";
 import type { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
 import type { ExcalidrawElement } from "@excalidraw/excalidraw/element/types";
@@ -24,6 +25,7 @@ export default function Whiteboard({
   const [height, setHeight] = useState(1000);
   const [excalidrawAPI, setExcalidrawAPI] =
     useState<ExcalidrawImperativeAPI | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const isDraggingRef = useRef<"top" | "bottom" | null>(null);
   const startYRef = useRef(0);
   const startHeightRef = useRef(0);
@@ -35,6 +37,7 @@ export default function Whiteboard({
     if (!currentSentence || !excalidrawAPI) return;
 
     const generateOrLoad = async () => {
+      setIsLoading(true);
       try {
         // 1. Check if we have cached elements for this scene
         const cachedElements = getSceneElements(currentIndex);
@@ -107,6 +110,8 @@ export default function Whiteboard({
         };
       } catch (error) {
         console.error("Failed to generate graph", error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -178,6 +183,7 @@ export default function Whiteboard({
 
   return (
     <div className="whiteboard-container" style={{ height: `${height}px` }}>
+      <LoadingBar visible={isLoading} />
       <div className="whiteboard-content">
         <Excalidraw
           excalidrawAPI={(api) => setExcalidrawAPI(api)}
