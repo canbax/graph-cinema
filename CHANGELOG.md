@@ -1,4 +1,4 @@
-## 0.0.1 (2026-02-08)
+## 0.0.1 (2026-02-09)
 
 ### Features
 
@@ -6,6 +6,7 @@
 - add about dialog ([8a0465d](https://github.com/canbax/graph-cinema/commit/8a0465d3d500ccc9fa96e42c0eff6c5a08bd0dff))
 - Add Bottom Up (BT) and Right to Left (RL) layout direction options to settings and diagram generation. ([0eade00](https://github.com/canbax/graph-cinema/commit/0eade0040f107120318c1b13d7840c6e315a8831))
 - add custom menu item (dummy for now) ([3bc3713](https://github.com/canbax/graph-cinema/commit/3bc37138d162dc8ff1824cc23324f492a1d78dad))
+- add loading bar ([724925e](https://github.com/canbax/graph-cinema/commit/724925e827389a69bf4a88f093410949d56e98c1))
 - add settings dialog ([7ed9f65](https://github.com/canbax/graph-cinema/commit/7ed9f655331f0c524b9415f1c249348dacc52e0d))
 - Add TextImporter component for article input and storage, replacing direct input functionality in ArticleReader. ([4f11b8d](https://github.com/canbax/graph-cinema/commit/4f11b8d669f144484058fe7ccefe7178c27270d7))
 - animated shapes and text ([04d6322](https://github.com/canbax/graph-cinema/commit/04d63229b00d2a784b18e9f37933c7a98ef53a16))
@@ -22,13 +23,17 @@
 - post processing to fix a bit overlaps but not enough ([15d9874](https://github.com/canbax/graph-cinema/commit/15d9874bafcb430536458f917c4539da4e854cda))
 - Replace boolean AI toggle with radio button ([cc510e3](https://github.com/canbax/graph-cinema/commit/cc510e350b9ab708513c32bcb5bd10f521bcb2ef))
 - Replace text-based ArticleReader controls with Lucide icons and update button styling. ([401ebe7](https://github.com/canbax/graph-cinema/commit/401ebe71c153a80fc459f545fd37c3f051a1cee2))
+- update icon ([f5d7190](https://github.com/canbax/graph-cinema/commit/f5d7190c85318453c78c85235a847294af183229))
 - update texts of convert buttons ([1e9fbdd](https://github.com/canbax/graph-cinema/commit/1e9fbdd5f3ddee2e46db8f0949cae16d3a9f4da1))
 
 ### Bug Fixes
 
+- after doing 'Draw Entire Script' fix 'Draw Scene by Scene' ([50e417f](https://github.com/canbax/graph-cinema/commit/50e417fbd1ecd4bd0b740caf1bbb04026acab6fb))
 - better width estimation from text length ([f8b139b](https://github.com/canbax/graph-cinema/commit/f8b139bd59f06a702d5b01a590e366b54b01710b))
 - call text-to-excalidraw properly ([c82484c](https://github.com/canbax/graph-cinema/commit/c82484ce288719201cffee1444f5f97989eb75e6))
 - delete log ([fe21a58](https://github.com/canbax/graph-cinema/commit/fe21a5830b85012e1673691d884d9a4ad9db893f))
+- fix drawing entire script at once ([6569f0c](https://github.com/canbax/graph-cinema/commit/6569f0cc5c0770817df774768ba1de5ec97525b4))
 - move top-most element if needed ([dcb0e94](https://github.com/canbax/graph-cinema/commit/dcb0e94c69f4743e12be98936f7cbe448cc5bd2d))
 - normalize linear Excalidraw element points to ensure correct positioning ([25c8f95](https://github.com/canbax/graph-cinema/commit/25c8f95fa60d737e25bcbaecceadd30ec2a68e8d))
+- on settings changed, clear scene elements cache ([bd7bd6b](https://github.com/canbax/graph-cinema/commit/bd7bd6b6f5388dacc792e1145571ce5cdc9bc507))
 - text becoming multi-line ([ded9868](https://github.com/canbax/graph-cinema/commit/ded9868420a7f40b3d99c93b76cf86eef09aece6))
